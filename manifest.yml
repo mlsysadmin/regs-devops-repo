@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: oci-devops-deployment
+  namespace: devops
 spec:
   selector:
     matchLabels:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-app
-          image: iad.ocir.io/sehubjapaciaas/oci_devops_java_app:${BUILDRUN_HASH}
+          image: nrt.ocir.io/nrcbpbtrtyz0/devops-repo:${BUILDRUN_HASH}
           command: ["java"]
           args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
@@ -41,11 +42,14 @@ spec:
         - name: fluentbit-config
           configMap:
             name: fluentbit-config-devops
+      imagePullSecrets:
+      - name: devops-secret
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: java-app-service
+  namespace: devops
   annotations:
     service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
     service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
