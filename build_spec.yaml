@@ -33,6 +33,6 @@ steps:
           docker build -t ${DOCKER_TAG} .
 
 outputArtifacts:
-  - name: myapp-image
+  - name: regs-image
     type: DOCKER_IMAGE
     location: ${DOCKER_TAG}
