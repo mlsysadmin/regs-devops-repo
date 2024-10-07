@@ -1,0 +1,38 @@
+version: 0.1
+component: build
+timeoutInSeconds: 6000
+runAs: root
+shell: bash
+env:
+  variables:
+    DEPLOYMENT_DIRECTORY: "${OCI_WORKSPACE_DIR}/deployment/${DEPLOYMENT_ENV}"
+    DOCKER_TAG: "nrt.ocir.io/nrcbpbtrtyz0/devops-repo:tagv1"
+  
+  exportedVariables:
+    - BUILDRUN_HASH    
+
+steps:
+
+  - type: Command
+    name: "Build container image"
+    timeoutInSeconds: 3000
+    command: |
+          export DEPLOYMENT_TIMEOUT="120s"
+          export BUILDRUN_HASH=`echo ${OCI_BUILD_RUN_ID} | rev | cut -c 1-7`
+          echo "BUILDRUN_HASH: " $BUILDRUN_HASH
+
+          export REGISTRY="nrt.ocir.io/nrcbpbtrtyz0/devops-repo"
+          export PROJECT_NAME="myapp-deployment"
+          export DEPLOYMENT_ENV="github_environment"
+          export IMAGE_CREATED_BY="OCIDevOps"
+          export GIT_TAG="$(git describe --tags)"
+          export DEPLOYMENT_DIRECTORY="${OCI_WORKSPACE_DIR}/deployment/${DEPLOYMENT_ENV}"
+          export IMAGE_VERSION="$(echo $OCI_BUILD_RUN_ID | rev | cut -c 1-7)-${IMAGE_CREATED_BY}"
+          export DOCKER_TAG="${REGISTRY}/${PROJECT_NAME}:${IMAGE_VERSION}"
+
+          docker build -t ${DOCKER_TAG} .
+
+outputArtifacts:
+  - name: myapp-image
+    type: DOCKER_IMAGE
+    location: ${DOCKER_TAG}

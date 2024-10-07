@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  namespace: devops
+  labels:
+    app: myapp
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 1200 
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp-container
+          image: nrt.ocir.io/nrcbpbtrtyz0/devops-repo:tagv1
+          ports:
+            - containerPort: 9000  
+          env:
+            - name: DEPLOYMENT_ENV
+              value: "github_environment"  
+            - name: IMAGE_CREATED_BY
+              value: "OCIDevOps"
+      imagePullSecrets:
+        - name: devops-secret  
