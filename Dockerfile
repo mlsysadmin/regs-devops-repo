@@ -1,5 +1,9 @@
-FROM php:7.4-cli
-WORKDIR /var/www/html
-COPY hello.php /var/www/html/index.php
-EXPOSE 9000
-CMD [ "php", "-S", "0.0.0.0:9000", "-t", "/var/www/html" ]
+FROM python
+
+WORKDIR /code
+
+COPY ./requirements.txt /code/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+COPY ./main.py /code/
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
