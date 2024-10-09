@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sample-oke-bg-app-deployment
+  namespace: ns-green
 spec:
   selector:
     matchLabels:
@@ -15,7 +16,7 @@ spec:
       containers:
         - name: sample-oke-bg-app
           # enter the path to your image, be sure to include the correct region prefix
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:${BUILDRUN_HASH}
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:qlkphkg
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -38,6 +39,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sample-oke-bg-app-service
+  namespace: ns-green
   annotations: 
     service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
 spec:
