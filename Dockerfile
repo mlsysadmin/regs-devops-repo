@@ -1,9 +1,13 @@
-FROM python
+FROM openjdk:17-alpine
 
-WORKDIR /code
+# following https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 
-COPY ./requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-COPY ./main.py /code/
+WORKDIR /usr/src/OCI-DevOps-Java
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+RUN apk add maven
+
+
+# Bundle app source
+COPY . .
+
+Run mvn clean install
