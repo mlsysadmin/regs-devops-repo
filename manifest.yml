@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-app
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:${BUILDRUN_HASH}
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:a6qd62g
           command: ["java"]
           args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
