@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-app
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v1
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-devops-repo:supremo-v1
           command: ["java"]
           args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
