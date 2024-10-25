@@ -1,23 +1,28 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: ns-green
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oci-devops-deployment-wiggy
+  name: supremo-deployment
   namespace: ns-green
 spec:
   selector:
     matchLabels:
-      app: java-app
+      app: python-gettingstarted
   replicas: 1
   template:
     metadata:
       labels:
-        app: java-app
+        app: python-gettingstarted
     spec:
       containers:
-        - name: java-app
-#          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v3
-          command: ["java"]
-          args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
+        - name: python-gettingstarted
+          # enter the path to your image, be sure to include the correct region prefix
+#          image: ghcr.io/mlsysadmin/regs-devops-repo-github-action:newv1
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v1
           imagePullPolicy: Always
           ports:
             - containerPort: 8890
@@ -28,11 +33,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: java-app-service-wiggy
+  name: supremo-service
   namespace: ns-green
   annotations:
     service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
-    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
 spec:
   type: LoadBalancer
   ports:
@@ -40,31 +44,4 @@ spec:
       protocol: TCP
       targetPort: 8890
   selector:
-    app: java-app
-#-------------------------------------------------------------------INGRESS--------------------------------------------------------------------------------------------
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: java-app-ingress-wiggy
-  namespace: ns-green
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  tls:
-  - hosts:
-    - wiggy.mlhuillier.net
-    secretName: net-tls
-  ingressClassName: nginx
-  rules:
-  - host: wiggy.mlhuillier.net
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: java-app-service
-            port:
-              number: 80
+    app: python-gettingstarted
