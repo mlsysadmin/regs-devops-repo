@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-app
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:${BUILDRUN_HASH}
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v1
           command: ["java"]
           args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
@@ -41,3 +41,30 @@ spec:
       targetPort: 8890
   selector:
     app: java-app
+#-------------------------------------------------------------------INGRESS--------------------------------------------------------------------------------------------
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: java-app-ingress
+  namespace: ns-green
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - wiggy.mlhuillier.net
+    secretName: net-tls
+  ingressClassName: nginx
+  rules:
+  - host: wiggy.mlhuillier.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: java-app-service
+            port:
+              number: 80
