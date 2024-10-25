@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oci-devops-deployment
+  name: oci-devops-deployment-wiggy
   namespace: ns-green
 spec:
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-app
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-devops-repo:supremo-v1
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v1
           command: ["java"]
           args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
@@ -28,7 +28,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: java-app-service
+  name: java-app-service-wiggy
   namespace: ns-green
   annotations:
     service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
@@ -46,7 +46,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: java-app-ingress
+  name: java-app-ingress-wiggy
   namespace: ns-green
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
