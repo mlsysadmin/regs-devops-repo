@@ -28,7 +28,7 @@ spec:
             - containerPort: 8890
               protocol: TCP
       imagePullSecrets:
-        - name: devopstest
+        - name: supremo
 ---
 apiVersion: v1
 kind: Service
