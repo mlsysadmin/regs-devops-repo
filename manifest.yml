@@ -1,28 +1,23 @@
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: ns-green
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: supremo-deployment
+  name: oci-devops-deployment
   namespace: ns-green
 spec:
   selector:
     matchLabels:
-      app: python-gettingstarted
+      app: java-app
   replicas: 1
   template:
     metadata:
       labels:
-        app: python-gettingstarted
+        app: java-app
     spec:
       containers:
-        - name: python-gettingstarted
-          # enter the path to your image, be sure to include the correct region prefix
-#          image: ghcr.io/mlsysadmin/regs-devops-repo-github-action:newv1
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v1
+        - name: java-app
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-v2
+          command: ["java"]
+          args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
           ports:
             - containerPort: 8890
@@ -33,10 +28,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: supremo-service
+  name: java-app-service
   namespace: ns-green
   annotations:
     service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
+    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
 spec:
   type: LoadBalancer
   ports:
@@ -44,4 +40,4 @@ spec:
       protocol: TCP
       targetPort: 8890
   selector:
-    app: python-gettingstarted
+    app: java-app
