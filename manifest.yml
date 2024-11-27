@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oci-devops-deployment
+  namespace: ns-green
+spec:
+  selector:
+    matchLabels:
+      app: java-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java-app
+    spec:
+      containers:
+        - name: java-app
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:${BUILDRUN_HASH}
+          command: ["java"]
+          args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8890
+              protocol: TCP
+      imagePullSecrets:
+        - name: devopstest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-app-service
+  namespace: ns-green
+  annotations:
+    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
+    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8890
+  selector:
+    app: java-app
