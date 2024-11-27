@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: java-app
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:${BUILDRUN_HASH}
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-dep-v1
           command: ["java"]
           args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
           imagePullPolicy: Always
@@ -23,21 +23,61 @@ spec:
             - containerPort: 8890
               protocol: TCP
       imagePullSecrets:
-        - name: devopstest
+        - name: supremo-secret
 ---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: java-app-service
+#  namespace: ns-green
+#  annotations:
+#    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
+#    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
+#spec:
+#  type: LoadBalancer
+#  ports:
+#    - port: 80
+#      protocol: TCP
+#      targetPort: 8890
+#  selector:
+#    app: java-app
 apiVersion: v1
 kind: Service
 metadata:
-  name: java-app-service
+  name: supremo-svc
   namespace: ns-green
-  annotations:
-    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
-    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 8890
+  - port: 80
+    targetPort: 8890
   selector:
     app: java-app
+#-------------------------------------------------------------------INGRESS--------------------------------------------------------------------------------------------
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: supremo-ingress
+  namespace: ns-green
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - supremo.mlhuillier.net
+    secretName: net-tls
+  rules:
+  - host: supremo.mlhuillier.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: supremo-svc
+            port:
+              number: 80
+
