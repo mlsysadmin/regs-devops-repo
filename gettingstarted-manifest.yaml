@@ -1,8 +1,3 @@
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: white
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,19 +21,61 @@ spec:
           ports:
             - containerPort: 3000
               protocol: TCP
+      imagePullSecrets:
+        - name: asys-system-secret
+#------------------------------------------------------------------SERVICE---------------------------------------------------------------------------------------------
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: node-gettingstarted-service
   namespace: white
-  annotations: 
-    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 3000
+  - port: 80
+    targetPort: 3000
   selector:
     app: node-gettingstarted
+#-------------------------------------------------------------------INGRESS--------------------------------------------------------------------------------------------
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: node-ingress
+  namespace: white
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - bam-e.mlhuillier.net
+    secretName: net-tls
+  ingressClassName: nginx
+  rules:
+  - host: bam-e.mlhuillier.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: node-gettingstarted-service
+            port:
+              number: 80
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: node-gettingstarted-service
+#  namespace: white
+#  annotations: 
+#    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
+#spec:
+#  type: LoadBalancer
+#  ports:
+#    - port: 80
+#      protocol: TCP
+#      targetPort: 3000
+#  selector:
+#    app: node-gettingstarted
