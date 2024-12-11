@@ -14,18 +14,16 @@ spec:
         app: node-gettingstarted
     spec:
       containers:
-      - name: node-gettingstarted
-        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:${BUILDRUN_HASH}
-        imagePullPolicy: Always 
-        ports:
-        - containerPort: 3000
-          protocol: TCP     
-        env:
-        - name: BUILDRUN_HASH
-          value: "${BUILDRUN_HASH}"
+        - name: node-gettingstarted
+          # enter the path to your image, be sure to include the correct region prefix
+          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:${BUILDRUN_HASH}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
       imagePullSecrets:
-        - name: asys-dev
-#------------------------------------------------------------------SERVICE---------------------------------------------------------------------------------------------#
+        - name: asys-system-secret
+#------------------------------------------------------------------SERVICE---------------------------------------------------------------------------------------------
 ---
 apiVersion: v1
 kind: Service

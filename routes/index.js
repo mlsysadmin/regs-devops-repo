@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Oracle Cloud DevOps example' });
+  res.render('index', { title: 'REGAN SAMPLE' });
 });
 
 module.exports = router;
