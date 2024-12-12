@@ -1,8 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oci-deployment
+  name: java-deployment
   namespace: white
+spec:
   selector:
     matchLabels:
       app: java-app
@@ -14,7 +15,8 @@ metadata:
     spec:
       containers:
       - name: java-app
-        mage: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:${BUILDRUN_HASH}
+        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:${BUILDRUN_HASH} # Corrected "mage" to "image"
+#        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:qcft4n6
         command: ["java"]
         args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
         imagePullPolicy: Always 
