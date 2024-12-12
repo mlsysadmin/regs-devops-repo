@@ -76,7 +76,7 @@ steps:
       docker build --pull --rm -t oci_devops_java_app .
 
 outputArtifacts:
-  - name: output01
+  - name: output02
     type: DOCKER_IMAGE
     # this location tag doesn't effect the tag used to deliver the container image
     # to the Container Registry
