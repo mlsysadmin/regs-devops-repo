@@ -1,34 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: asys-deployment-dev
+  name: oci-deployment
   namespace: white
-spec:
   selector:
     matchLabels:
-      app: asys-app-dev
+      app: java-app
   replicas: 1
   template:
     metadata:
       labels:
-        app: asys-app-dev
+        app: java-app
     spec:
       containers:
-        - name: asys-app-dev
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:aip5wxb
-          command: ["java"]
-          args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8890
-              protocol: TCP
+      - name: java-app
+        mage: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:${BUILDRUN_HASH}
+        command: ["java"]
+        args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 8890
+          protocol: TCP     
+        env:
+        - name: BUILDRUN_HASH
+          value: "${BUILDRUN_HASH}"
       imagePullSecrets:
         - name: asys-dev
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: asys-svc-dev
+  name: java-app-service
   namespace: white
 spec:
   type: ClusterIP
@@ -36,32 +38,47 @@ spec:
   - port: 80
     targetPort: 8890
   selector:
-    app: asys-app-dev
+    app: java-app
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: java-app-service
+#  namespace: white
+#  annotations:
+#    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
+#    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
+#spec:
+#  type: LoadBalancer
+#  ports:
+#    - port: 80
+#      protocol: TCP
+#      targetPort: 8890
+#  selector:
+#    app: java-app
+#-------------------------------------------------------------------INGRESS--------------------------------------------------------------------------------------------
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: asys-ingress-dev
+  name: java-app-ingress
   namespace: white
   annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_clear_headers "X-Powered-By";
 spec:
-  ingressClassName: nginx
   tls:
   - hosts:
-    - ursa.mlhuillier.net
+    - pancit-canton.mlhuillier.net
     secretName: net-tls
+  ingressClassName: nginx
   rules:
-  - host: ursa.mlhuillier.net
+  - host: pancit-canton.mlhuillier.net
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: asys-svc-dev
+            name: java-app-service
             port:
               number: 80
