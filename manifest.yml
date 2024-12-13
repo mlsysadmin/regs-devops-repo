@@ -16,7 +16,7 @@ spec:
       containers:
       - name: java-app
         image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:${BUILDRUN_HASH} # Corrected "mage" to "image"
-#        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:qcft4n6
+#        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:a6eoobc
         command: ["java"]
         args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
         imagePullPolicy: Always 
