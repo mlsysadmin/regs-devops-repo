@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oci-devops-deployment
-  namespace: ns-green
+  name: java-deployment
+  namespace: white
 spec:
   selector:
     matchLabels:
@@ -14,22 +14,38 @@ spec:
         app: java-app
     spec:
       containers:
-        - name: java-app
-          image: nrt.ocir.io/nrcbpbtrtyz0/regs-container:supremo-dep-v1
-          command: ["java"]
-          args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8890
-              protocol: TCP
+      - name: java-app
+        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:${BUILDRUN_HASH} # Corrected "mage" to "image"
+#        image: nrt.ocir.io/nrcbpbtrtyz0/regs-testing:a6eoobc
+        command: ["java"]
+        args: ["-jar", "target/hello-0.0.1-SNAPSHOT.jar"]
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 8890
+          protocol: TCP     
+        env:
+        - name: BUILDRUN_HASH
+          value: "${BUILDRUN_HASH}"
       imagePullSecrets:
-        - name: supremo-secret
+        - name: asys-dev
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-app-service
+  namespace: white
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8890
+  selector:
+    app: java-app
 #apiVersion: v1
 #kind: Service
 #metadata:
 #  name: java-app-service
-#  namespace: ns-green
+#  namespace: white
 #  annotations:
 #    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
 #    service.beta.kubernetes.io/oci-load-balancer-backend-protocol: "HTTP"
@@ -41,43 +57,30 @@ spec:
 #      targetPort: 8890
 #  selector:
 #    app: java-app
-apiVersion: v1
-kind: Service
-metadata:
-  name: supremo-svc
-  namespace: ns-green
-spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    targetPort: 8890
-  selector:
-    app: java-app
 #-------------------------------------------------------------------INGRESS--------------------------------------------------------------------------------------------
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: supremo-ingress
-  namespace: ns-green
+  name: java-app-ingress
+  namespace: white
   annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /
-    kubernetes.io/ingress.class: nginx
 spec:
-  ingressClassName: nginx
   tls:
   - hosts:
-    - supremo.mlhuillier.net
+    - pancit-canton.mlhuillier.net
     secretName: net-tls
+  ingressClassName: nginx
   rules:
-  - host: supremo.mlhuillier.net
+  - host: pancit-canton.mlhuillier.net
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: supremo-svc
+            name: java-app-service
             port:
               number: 80
-
